@@ -1,0 +1,39 @@
+Decisions I Made - Dominic Addams
+
+Dockerfile for Master:
+- My first decision was to create a Master Image with Docker. I did this because it meant I could control the version of jenkins that was used and configure specific plugins for near bare minimum infrastructure.
+
+- This is instead of using latest image version which could affect dependencies with sudden update. As well as removing the need to set additional plugins for jenkins.
+
+Minikube for Infrastructure/Cluster:
+- I chose minikube for my Kubernetes Cluster as it comes readily available with Docker for Desktop and because I find it easier to deploy and manage kubernetes resources during testing.
+
+- The added bonuses were having an easily available dashboard, running and accessing resources locally to remove need for additional resources for security. Which allows a cleaner and quicker setup.
+
+Visual Studio Code for Code Editor:
+- Compared to other Code Editors, I found VS Code to be easier for: installing plugins, viewing local files, creating resources with auto-fill option and using integrated terminal to create and delete resources.
+
+Deployment for Master POD:
+- A Deployment lets me use the replicas option which tells Kubernetes how many instances of the POD to run and keep running.
+
+- Using a Deployment instead of a standard POD allowed me to always have a master pod running and not worry about if it dies as Kubernetes will automatically launch a new one. Plus, I was able to set the option to stop Jenkins initial setup from running.
+
+Creating New User and Binding it to Cluster-Admin Role:
+- I chose to create a new user because Kubernetes uses the Default user if no other user is specified which doesn’t have admin rights for managing the Cluster.
+
+- This is why I bound the new user to the Cluster-Admin role. As it gave Jenkins the necessary access but also prevented new PODs or resources from having admin privileges by using default user bound to Cluster-Admin.
+
+NodePort for Service:
+- If I was replicating a production setup, I would’ve used an Ingress or load balancer. However, because I needed my local machine to access the minikube VM. I used a NodePort as my Service as it directly mapped the Port outside the cluster. 
+
+0 Executors on Jenkins Host:
+- By setting the number of executors on Jenkins to 0 and combining it with kubernetes Pod Templates. It meant Jenkins would always launch and use a new POD to run tasks.
+
+- Doing it this way forced jenkins to use new PODs instead of using the Master POD and once the task was finished, Kubernetes would kill the Pod to stop running unneeded resources.
+
+- The main benefit of this was adding Scalability to the Cluster meaning “Jenkins” could scale out and scale in to run its tasks.
+
+Defining Slave PODs on Master not Separately:
+- What I mean by this is, rather than creating a new deployment and trying to connect it to Master Pod, wasn’t as efficient as running it through the Master.
+
+- By using the Kubernetes jenkins plugin and defining the Pod with it, it made Jenkins provide the requirements for running its task and managing the agent on the slave.
